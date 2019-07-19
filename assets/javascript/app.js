@@ -54,7 +54,9 @@ database.ref().on("child_added", function(childSnapshot) {
     console.log(trnTime);
     console.log(trnFrequency);
 
-    var firstTimeConverted = moment(trnTime, "HH:mm").subtract(1, "years");
+    var firstTimeConverted = moment.unix(trnTime).format("MM/DD/YYYY");
+
+    // var firstTimeConverted = moment(trnTime, "HH:mm").subtract(1, "years");
     console.log(firstTimeConverted);
 
     var nextArrival = moment().diff(moment(trnTime, "m"), "minutes");
@@ -66,7 +68,7 @@ database.ref().on("child_added", function(childSnapshot) {
 
     // Difference between the times
     var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
-    console.log("DIFFERENCE IN TIME: " + diffTime);
+    console.log(diffTime);
 
     // Time apart (remainder)
     var tRemainder = diffTime % trnFrequency;
@@ -77,7 +79,7 @@ database.ref().on("child_added", function(childSnapshot) {
     console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
 
     // Next Train
-    var nextTrain = moment().add(tMinutesTillTrain, "minutes");
+    var nextTrain = moment().add(tMinutesTillTrain, "minutes").format("hh:mm");
     console.log("ARRIVAL TIME: " + moment(nextTrain).format("hh:mm"));
 
     var newRow = $("<tr>").append(
