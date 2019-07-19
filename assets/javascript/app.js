@@ -22,7 +22,7 @@ $("#add-train-btn").on("click", function (event) {
     var newTrain = {
         name: trnName,
         destination: trnDestination,
-        time: trnTime,
+        time:  firebase.database.ServerValue.TIMESTAMP,
         frequency: trnFrequency
     };
 
@@ -42,7 +42,7 @@ $("#add-train-btn").on("click", function (event) {
 });
 
 database.ref().on("child_added", function(childSnapshot) {
-    console.log(childSnapshot.val());
+    console.log("This is my object: ", childSnapshot.val());
 
     var trnName = childSnapshot.val().name;
     var trnDestination = childSnapshot.val().destination;
@@ -54,14 +54,38 @@ database.ref().on("child_added", function(childSnapshot) {
     console.log(trnTime);
     console.log(trnFrequency);
 
+    var firstTimeConverted = moment(trnTime, "HH:mm").subtract(1, "years");
+    console.log(firstTimeConverted);
+
     var nextArrival = moment().diff(moment(trnTime, "m"), "minutes");
     console.log(nextArrival);
+
+    // Current Time
+    var currentTime = moment();
+    console.log("CURRENT TIME: " + moment(currentTime).format("hh:mm"));
+
+    // Difference between the times
+    var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
+    console.log("DIFFERENCE IN TIME: " + diffTime);
+
+    // Time apart (remainder)
+    var tRemainder = diffTime % trnFrequency;
+    console.log(tRemainder);
+
+    // Minute Until Train
+    var tMinutesTillTrain = trnFrequency - tRemainder;
+    console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+
+    // Next Train
+    var nextTrain = moment().add(tMinutesTillTrain, "minutes");
+    console.log("ARRIVAL TIME: " + moment(nextTrain).format("hh:mm"));
 
     var newRow = $("<tr>").append(
         $("<td>").text(trnName),
         $("<td>").text(trnDestination),
-        $("<td>").text(trnTime),
         $("<td>").text(trnFrequency),
+        $("<td>").text(nextTrain),
+        $("<td>").text(tMinutesTillTrain),
       );
 
       $("#train-schedule > tbody").append(newRow);
